@@ -1,4 +1,4 @@
-# Online Exam API — Team E
+# Online Exam API
 
 A Node.js/TypeScript REST API for creating and taking online quizzes/exams. It supports admin-managed quiz authoring and student quiz-taking flows, including timed attempts, answer submission, scoring, and result review — backed by MongoDB via Mongoose.
 
@@ -12,17 +12,17 @@ A Node.js/TypeScript REST API for creating and taking online quizzes/exams. It s
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Runtime | Node.js (ESM, `"type": "module"`) |
-| Language | TypeScript |
-| Web framework | Express 5 |
-| Database / ODM | MongoDB / Mongoose |
-| Auth | JSON Web Tokens (`jsonwebtoken`) |
-| Password hashing | `bcrypt-ts` |
-| Validation | `zod` |
-| Email | `nodemailer` |
-| Dev tooling | `tsc --watch`, `concurrently`, `ts-node-dev` |
+| Layer            | Technology                                   |
+| ---------------- | -------------------------------------------- |
+| Runtime          | Node.js (ESM, `"type": "module"`)            |
+| Language         | TypeScript                                   |
+| Web framework    | Express 5                                    |
+| Database / ODM   | MongoDB / Mongoose                           |
+| Auth             | JSON Web Tokens (`jsonwebtoken`)             |
+| Password hashing | `bcrypt-ts`                                  |
+| Validation       | `zod`                                        |
+| Email            | `nodemailer`                                 |
+| Dev tooling      | `tsc --watch`, `concurrently`, `ts-node-dev` |
 
 ## Project Structure
 
@@ -53,42 +53,46 @@ A Node.js/TypeScript REST API for creating and taking online quizzes/exams. It s
 ## Data Models
 
 ### Auth (User)
-| Field | Type | Notes |
-|---|---|---|
-| `firstName`, `lastName` | `string` | Required |
-| `email` | `string` | Required, unique |
-| `image` | `string` | Required |
-| `passwordHash` | `string` | Required |
-| `role` | `UserRole` | Defaults to `USER` |
+
+| Field                                   | Type              | Notes                              |
+| --------------------------------------- | ----------------- | ---------------------------------- |
+| `firstName`, `lastName`                 | `string`          | Required                           |
+| `email`                                 | `string`          | Required, unique                   |
+| `image`                                 | `string`          | Required                           |
+| `passwordHash`                          | `string`          | Required                           |
+| `role`                                  | `UserRole`        | Defaults to `USER`                 |
 | `token`, `resetToken`, `resetTokenDate` | `string` / `Date` | Used for auth/password reset flows |
 
 ### Quiz
-| Field | Type | Notes |
-|---|---|---|
-| `title`, `description`, `instructions` | `string` | Required |
-| `durationMinutes` | `number` | Required, min `1` |
-| `passScorePercentage` | `number` | Required, `0`–`100` |
-| `questions` | `IQuestion[]` | Embedded documents |
-| `createdBy` | `ObjectId` (ref `User`) | Required |
-| `isPublished` | `boolean` | Defaults to `false` |
+
+| Field                                  | Type                    | Notes               |
+| -------------------------------------- | ----------------------- | ------------------- |
+| `title`, `description`, `instructions` | `string`                | Required            |
+| `durationMinutes`                      | `number`                | Required, min `1`   |
+| `passScorePercentage`                  | `number`                | Required, `0`–`100` |
+| `questions`                            | `IQuestion[]`           | Embedded documents  |
+| `createdBy`                            | `ObjectId` (ref `User`) | Required            |
+| `isPublished`                          | `boolean`               | Defaults to `false` |
 
 Each **Question** has `text`, `type` (`single` \| `multi`), `points` (min `1`), and 2+ **Options**, each with `text` and `isCorrect`.
 
 ### QuizAttempt
-| Field | Type | Notes |
-|---|---|---|
-| `userId`, `quizId` | `ObjectId` refs | Required |
-| `startTime` | `Date` | Required |
-| `submittedAt` | `Date` | Set on submission |
-| `status` | `"in_progress" \| "submitted" \| "expired"` | Defaults to `in_progress` |
-| `scorePercentage`, `passed`, `correctCount` | number/boolean | Populated on scoring |
-| `answers` | `IAnswer[]` | Each with `questionId` and `selectedOptionIds` |
+
+| Field                                       | Type                                        | Notes                                          |
+| ------------------------------------------- | ------------------------------------------- | ---------------------------------------------- |
+| `userId`, `quizId`                          | `ObjectId` refs                             | Required                                       |
+| `startTime`                                 | `Date`                                      | Required                                       |
+| `submittedAt`                               | `Date`                                      | Set on submission                              |
+| `status`                                    | `"in_progress" \| "submitted" \| "expired"` | Defaults to `in_progress`                      |
+| `scorePercentage`, `passed`, `correctCount` | number/boolean                              | Populated on scoring                           |
+| `answers`                                   | `IAnswer[]`                                 | Each with `questionId` and `selectedOptionIds` |
 
 Indexes: `{ userId: 1 }` and `{ userId: 1, quizId: 1 }` for efficient attempt lookups.
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js (version compatible with the TypeScript/`@types/node` versions in `package.json`)
 - A running MongoDB instance (local or hosted, e.g., MongoDB Atlas)
 
@@ -134,45 +138,45 @@ Base path for quiz routes: assumed to be mounted at `/api/quiz` (or similar) in 
 
 ### Auth Routes (`/api/auth`)
 
-| Method | Endpoint | Description | Auth required |
-|---|---|---|---|
-| POST | `/api/auth/signup` | Register a new user | No |
-| POST | `/api/auth/signin` | Log in and receive a token | No |
-| POST | `/api/auth/forget-password` | Request a password reset | No |
-| POST | `/api/auth/reset-password` | Reset password using reset token | No |
-| POST | `/api/auth/update-password` | Update password | No* |
+| Method | Endpoint                    | Description                      | Auth required |
+| ------ | --------------------------- | -------------------------------- | ------------- |
+| POST   | `/api/auth/signup`          | Register a new user              | No            |
+| POST   | `/api/auth/signin`          | Log in and receive a token       | No            |
+| POST   | `/api/auth/forget-password` | Request a password reset         | No            |
+| POST   | `/api/auth/reset-password`  | Reset password using reset token | No            |
+| POST   | `/api/auth/update-password` | Update password                  | No\*          |
 
 \* No `isAuth` middleware is currently attached to this route — confirm whether it should be protected.
 
 ### Quiz Routes — Admin
 
-| Method | Endpoint | Description | Auth required |
-|---|---|---|---|
-| POST | `/admin` | Create a quiz | Yes (`isAuth`) |
-| GET | `/admin` | List all quizzes (admin view) | No* |
-| GET | `/admin/:id` | Get a single quiz (admin view) | No* |
-| PUT | `/admin/:id` | Update a quiz | No* |
-| DELETE | `/admin/:id` | Delete a quiz | No* |
+| Method | Endpoint     | Description                    | Auth required  |
+| ------ | ------------ | ------------------------------ | -------------- |
+| POST   | `/admin`     | Create a quiz                  | Yes (`isAuth`) |
+| GET    | `/admin`     | List all quizzes (admin view)  | No\*           |
+| GET    | `/admin/:id` | Get a single quiz (admin view) | No\*           |
+| PUT    | `/admin/:id` | Update a quiz                  | No\*           |
+| DELETE | `/admin/:id` | Delete a quiz                  | No\*           |
 
 \* Only the create route currently has `isAuth` attached; the other admin routes appear unprotected in the code shown. Consider adding `isAuth` (and role/admin checks) to these as well.
 
 ### Quiz Routes — Student
 
-| Method | Endpoint | Description | Auth required |
-|---|---|---|---|
-| GET | `/` | List published quizzes | Yes |
-| GET | `/:id` | Get quiz detail | Yes |
-| POST | `/:id/start` | Start a quiz attempt | Yes |
-| POST | `/attempts/:attemptId/submit` | Submit answers for an attempt | Yes |
-| GET | `/attempts/:attemptId/result` | Get attempt result (score, pass/fail) | Yes |
-| GET | `/attempts/:attemptId/review` | Review answers for an attempt | Yes |
+| Method | Endpoint                      | Description                           | Auth required |
+| ------ | ----------------------------- | ------------------------------------- | ------------- |
+| GET    | `/`                           | List published quizzes                | Yes           |
+| GET    | `/:id`                        | Get quiz detail                       | Yes           |
+| POST   | `/:id/start`                  | Start a quiz attempt                  | Yes           |
+| POST   | `/attempts/:attemptId/submit` | Submit answers for an attempt         | Yes           |
+| GET    | `/attempts/:attemptId/result` | Get attempt result (score, pass/fail) | Yes           |
+| GET    | `/attempts/:attemptId/review` | Review answers for an attempt         | Yes           |
 
 All student routes are protected by the `isAuth` middleware.
 
 ## Scripts
 
-| Script | Command | Description |
-|---|---|---|
+| Script  | Command                                                      | Description                                                             |
+| ------- | ------------------------------------------------------------ | ----------------------------------------------------------------------- |
 | `start` | `concurrently "tsc --watch" "node --watch ./dist/server.js"` | Compiles TypeScript in watch mode and runs the server with auto-restart |
 
 ## Notes / Suggestions
