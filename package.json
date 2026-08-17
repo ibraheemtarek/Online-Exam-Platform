@@ -1,5 +1,5 @@
 {
-  "name": "online-exam-api-team-e",
+  "name": "online-exam-api",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -10,17 +10,17 @@
     "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/elevate-node-c3/online-exam-api-team-e.git"
+  "type": "git",
+  "url": "git+https://github.com/ibraheemtarek/Online-Exam-Platform.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/elevate-node-c3/online-exam-api-team-e/issues"
+  "url": "https://github.com/ibraheemtarek/Online-Exam-Platform/issues"
   },
-  "homepage": "https://github.com/elevate-node-c3/online-exam-api-team-e#readme",
+  "homepage": "https://github.com/ibraheemtarek/Online-Exam-Platform#readme",
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^8.0.1",
